@@ -188,11 +188,17 @@ public class FileToFileServlet extends HttpServlet {
 
     }
 
+    public static void main(String args[]) throws IOException, ParseException {
+        // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\input\\customers.json");
+        // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\fruits.json");
+
+    }
+
     public static String jsonToExcel(String input) throws IOException, ParseException {
         String name = getFileName("excelExport");
         FileReader reader = new FileReader(input);
         JSONParser jsonParser = new JSONParser();
-        List<HashMap<String, String>> map = (JSONArray) jsonParser.parse(reader);
+        List<HashMap<String, String>> map = (List<HashMap<String, String>>) jsonParser.parse(reader);
         Set<String> keySt = map.get(0).keySet();
         // Writing excel headers
         String filepath = System.getProperty("java.io.tmpdir");
