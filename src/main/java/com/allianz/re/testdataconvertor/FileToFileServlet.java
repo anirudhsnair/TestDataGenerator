@@ -190,7 +190,7 @@ public class FileToFileServlet extends HttpServlet {
 
     public static void main(String args[]) throws IOException, ParseException {
         // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\input\\customers.json");
-        // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\fruits.json");
+        jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\fruits.json");
 
     }
 
@@ -198,42 +198,89 @@ public class FileToFileServlet extends HttpServlet {
         String name = getFileName("excelExport");
         FileReader reader = new FileReader(input);
         JSONParser jsonParser = new JSONParser();
-        List<HashMap<String, String>> map = (List<HashMap<String, String>>) jsonParser.parse(reader);
-        Set<String> keySt = map.get(0).keySet();
-        // Writing excel headers
-        String filepath = System.getProperty("java.io.tmpdir");
-        String filename = filepath + name + ".xlsx";
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("0");
-        XSSFRow rowhead = sheet.createRow((short) 0);
-        XSSFCellStyle style = workbook.createCellStyle();
-        XSSFFont font = workbook.createFont();
-        font.setFontName(XSSFFont.DEFAULT_FONT_NAME);
-        font.setFontHeightInPoints((short) 10);
-        font.setBold(true);
-        style.setFont(font);
-        int i = 0;
-        for (String s : keySt) {
-            rowhead.createCell(i).setCellValue(s);
-            rowhead.getCell(i).setCellStyle(style);
-            i++;
-        }
-        int k = 1;
-        for (int j = 0; j < map.size(); j++) {
-
-            Collection<String> value = map.get(j).values();
-            rowhead = sheet.createRow((short) k);
-            i = 0;
-            for (Object v : value) {
-                rowhead.createCell(i).setCellValue(v.toString());
+        Object obj = jsonParser.parse(reader);
+        Set<String> keySt = null;
+        List<HashMap<String, String>> map = null;
+        String filepath = null;
+        if (obj instanceof JSONArray) {
+            reader = new FileReader(input);
+            map = (JSONArray) jsonParser.parse(reader);
+            keySt = map.get(0).keySet();
+            filepath = System.getProperty("java.io.tmpdir");
+            String filename = filepath + name + ".xlsx";
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("0");
+            XSSFRow rowhead = sheet.createRow((short) 0);
+            XSSFCellStyle style = workbook.createCellStyle();
+            XSSFFont font = workbook.createFont();
+            font.setFontName(XSSFFont.DEFAULT_FONT_NAME);
+            font.setFontHeightInPoints((short) 10);
+            font.setBold(true);
+            style.setFont(font);
+            int i = 0;
+            for (String s : keySt) {
+                rowhead.createCell(i).setCellValue(s);
+                rowhead.getCell(i).setCellStyle(style);
                 i++;
             }
-            k++;
+            int k = 1;
+            for (int j = 0; j < map.size(); j++) {
+
+                Collection<String> value = map.get(j).values();
+                rowhead = sheet.createRow((short) k);
+                i = 0;
+                for (Object v : value) {
+                    rowhead.createCell(i).setCellValue(v.toString());
+                    i++;
+                }
+                k++;
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.close();
+
+        } else {
+            JSONArray jArray = new JSONArray();
+            jArray.add(obj);
+            map = jArray;
+            keySt = map.get(0).keySet();
+            filepath = System.getProperty("java.io.tmpdir");
+            String filename = filepath + name + ".xlsx";
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("0");
+            XSSFRow rowhead = sheet.createRow((short) 0);
+            XSSFCellStyle style = workbook.createCellStyle();
+            XSSFFont font = workbook.createFont();
+            font.setFontName(XSSFFont.DEFAULT_FONT_NAME);
+            font.setFontHeightInPoints((short) 10);
+            font.setBold(true);
+            style.setFont(font);
+            int i = 0;
+            for (String s : keySt) {
+                rowhead.createCell(i).setCellValue(s);
+                rowhead.getCell(i).setCellStyle(style);
+                i++;
+            }
+            int k = 1;
+            for (int j = 0; j < map.size(); j++) {
+
+                Collection<String> value = map.get(j).values();
+                rowhead = sheet.createRow((short) k);
+                i = 0;
+                for (Object v : value) {
+                    rowhead.createCell(i).setCellValue(v.toString());
+                    i++;
+                }
+                k++;
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.close();
+
         }
-        FileOutputStream fileOut = new FileOutputStream(filename);
-        workbook.write(fileOut);
-        fileOut.close();
-        workbook.close();
+        // Writing excel headers
         return filepath;
     }
 
