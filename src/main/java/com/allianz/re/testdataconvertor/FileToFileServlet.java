@@ -61,6 +61,10 @@ public class FileToFileServlet extends HttpServlet {
 
     private String type;
 
+    private String loc;
+
+    private String filename;
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // checks if the request actually contains upload file
@@ -107,6 +111,7 @@ public class FileToFileServlet extends HttpServlet {
                 for (FileItem item : formItems) {
                     // processes only fields that are not form fields
                     if (!item.isFormField()) {
+
                         fileName = new File(item.getName()).getName();
                         filePath = uploadPath + File.separator + fileName;
                         File storeFile = new File(filePath);
@@ -115,19 +120,42 @@ public class FileToFileServlet extends HttpServlet {
                         item.write(storeFile);
                         request.setAttribute("message", "Upload has been done successfully!");
                     } else {
-                        type = item.getString();
+                        if (item.getFieldName().equals("loc")) {
+                            loc = item.getString();
+                        } else if (item.getFieldName().equals("type")) {
+                            type = item.getString();
+
+                        }
+
+                        if (item.getFieldName().equals("outputfileName")) {
+                            filename = item.getString();
+
+                        }
+
                     }
                 }
             }
+            // String name = item.getFieldName();
+            System.out.println("outputfileName=" + filename);
+            System.out.println("type=" + type);
+
             String outputPath = null;
+            String ext = null;
             if (type.equals("JSON to Excel")) {
-                outputPath = jsonToExcel(filePath);
+                outputPath = jsonToExcel(filePath, loc, filename);
+                ext = ".xlsx";
             } else if (type.equals("Excel to JSON")) {
-                outputPath = excelToJson(filePath);
+                outputPath = excelToJson(filePath, loc, filename);
+                ext = ".json";
+
             } else if (type.equals("XML to JSON")) {
-                outputPath = xmlToJson(filePath);
+                outputPath = xmlToJson(filePath, loc, filename);
+                ext = ".json";
+
             } else if (type.equals("JSON to XML")) {
-                outputPath = jsonToXml(filePath);
+                outputPath = jsonToXml(filePath, loc, filename);
+                ext = ".xml";
+
             }
 
             PrintWriter writer = response.getWriter();
@@ -138,7 +166,14 @@ public class FileToFileServlet extends HttpServlet {
             htmlResponse +=
                          "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
             htmlResponse += "<center>";
-            htmlResponse += "<h2>Hurray! Your test-data is ready @: " + outputPath + "<colur=blue>" + "<br/>";
+            if (filename.isEmpty()) {
+
+                htmlResponse +=
+                             "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
+            } else {
+                htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + filename + ext
+                        + "] is ready @: " + outputPath + "<br/>";
+            }
             htmlResponse += "</center>";
             htmlResponse += "<footer>\r\n"
                     + "<img src=\"gtf.PNG\" style=\"float: right;\"width=\"95\" height=\"22\" />\r\n" + "</footer>";
@@ -151,12 +186,21 @@ public class FileToFileServlet extends HttpServlet {
 
     }
 
-    public static String jsonToXml(String input) throws IOException, ParseException {
+    public static String jsonToXml(String input, String loc, String filename) throws IOException, ParseException {
         String name = getFileName("xmlExport");
         FileReader reader = new FileReader(input);
         JSONParser jsonParser = new JSONParser();
-        String filepath = System.getProperty("java.io.tmpdir");
-        String filename = filepath + name + ".xml";
+        String filepath;
+        if (loc.isEmpty()) {
+            filepath = System.getProperty("java.io.tmpdir");
+        } else {
+            filepath = loc;
+        }
+        if (filename.isEmpty()) {
+            filename = filepath + name + ".xml";
+        } else {
+            filename = filepath + filename + ".xml";
+        }
         String jsonStr = jsonParser.parse(reader).toString();
         jsonStr = jsonStr.replace("[", "").replace("]", "");
         String s[] = jsonStr.split("},");
@@ -190,11 +234,11 @@ public class FileToFileServlet extends HttpServlet {
 
     public static void main(String args[]) throws IOException, ParseException {
         // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\input\\customers.json");
-        jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\fruits.json");
+        // jsonToExcel("\\\\WWG00M.ROOTDOM.NET\\DFS\\HOME\\re00691\\ICM\\Desktop\\fruits.json");
 
     }
 
-    public static String jsonToExcel(String input) throws IOException, ParseException {
+    public static String jsonToExcel(String input, String loc, String filename) throws IOException, ParseException {
         String name = getFileName("excelExport");
         FileReader reader = new FileReader(input);
         JSONParser jsonParser = new JSONParser();
@@ -206,8 +250,63 @@ public class FileToFileServlet extends HttpServlet {
             reader = new FileReader(input);
             map = (JSONArray) jsonParser.parse(reader);
             keySt = map.get(0).keySet();
-            filepath = System.getProperty("java.io.tmpdir");
-            String filename = filepath + name + ".xlsx";
+            if (loc.isEmpty()) {
+                filepath = System.getProperty("java.io.tmpdir");
+            } else {
+                filepath = loc;
+            }
+            if (filename.isEmpty()) {
+                filename = filepath + name + ".xlsx";
+            } else {
+                filename = filepath + filename + ".xlsx";
+            }
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("0");
+            XSSFRow rowhead = sheet.createRow((short) 0);
+            XSSFCellStyle style = workbook.createCellStyle();
+            XSSFFont font = workbook.createFont();
+            font.setFontName(XSSFFont.DEFAULT_FONT_NAME);
+            font.setFontHeightInPoints((short) 10);
+            font.setBold(true);
+            style.setFont(font);
+            int i = 0;
+            for (String s : keySt) {
+                rowhead.createCell(i).setCellValue(s);
+                rowhead.getCell(i).setCellStyle(style);
+                i++;
+            }
+            int k = 1;
+            for (int j = 0; j < map.size(); j++) {
+
+                Collection<String> value = map.get(j).values();
+                rowhead = sheet.createRow((short) k);
+                i = 0;
+                for (Object v : value) {
+                    rowhead.createCell(i).setCellValue(v.toString());
+                    i++;
+                }
+                k++;
+            }
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+            fileOut.close();
+            workbook.close();
+
+        } else if (obj instanceof JSONObject) {
+            JSONArray jArray = new JSONArray();
+            jArray.add(obj);
+            map = jArray;
+            keySt = map.get(0).keySet();
+            if (loc.isEmpty()) {
+                filepath = System.getProperty("java.io.tmpdir");
+            } else {
+                filepath = loc;
+            }
+            if (filename.isEmpty()) {
+                filename = filepath + name + ".xlsx";
+            } else {
+                filename = filepath + filename + ".xlsx";
+            }
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet("0");
             XSSFRow rowhead = sheet.createRow((short) 0);
@@ -245,8 +344,17 @@ public class FileToFileServlet extends HttpServlet {
             jArray.add(obj);
             map = jArray;
             keySt = map.get(0).keySet();
-            filepath = System.getProperty("java.io.tmpdir");
-            String filename = filepath + name + ".xlsx";
+            if (loc.isEmpty()) {
+                filepath = System.getProperty("java.io.tmpdir");
+            } else {
+                filepath = loc;
+            }
+            if (filename.isEmpty()) {
+                filename = filepath + name + ".xlsx";
+            } else {
+                filename = filepath + filename + ".xlsx";
+
+            }
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet sheet = workbook.createSheet("0");
             XSSFRow rowhead = sheet.createRow((short) 0);
@@ -290,9 +398,12 @@ public class FileToFileServlet extends HttpServlet {
         return baseName.concat(String.format("_%s", dateTimeInfo));
     }
 
-    public static String excelToJson(String input)
+    public static String excelToJson(String input, String loc, String filename)
             throws EncryptedDocumentException, InvalidFormatException, IOException {
-        String filename = getFileName("jsonExport");
+        if (filename.isEmpty()) {
+            filename = getFileName("jsonExport");
+        }
+
         JSONArray jarray = new JSONArray();
         Workbook workbook = WorkbookFactory.create(new File(input));
         int sheets = workbook.getNumberOfSheets();
@@ -321,7 +432,12 @@ public class FileToFileServlet extends HttpServlet {
 
         }
         FileWriter file = null;
-        String filepath = System.getProperty("java.io.tmpdir");
+        String filepath;
+        if (loc.isEmpty()) {
+            filepath = System.getProperty("java.io.tmpdir");
+        } else {
+            filepath = loc;
+        }
         try {
 
             file = new FileWriter(filepath + filename + ".json");
@@ -342,9 +458,12 @@ public class FileToFileServlet extends HttpServlet {
         return filepath;
     }
 
-    public static String xmlToJson(String input) {
+    public static String xmlToJson(String input, String loc, String filename) {
         String filepath = null;
-        String filename = getFileName("jsonExport");
+        if (filename.isEmpty()) {
+            filename = getFileName("jsonExport");
+        }
+
         JSONObject jsonObj = null;
         try {
             File file = new File(input);
@@ -357,7 +476,11 @@ public class FileToFileServlet extends HttpServlet {
 
             String xml = builder.toString();
             jsonObj = XML.toJSONObject(xml);
-            filepath = System.getProperty("java.io.tmpdir");
+            if (loc.isEmpty()) {
+                filepath = System.getProperty("java.io.tmpdir");
+            } else {
+                filepath = loc;
+            }
             FileWriter fileWriter = new FileWriter(filepath + filename + ".json");
 
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);

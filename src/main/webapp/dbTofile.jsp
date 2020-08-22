@@ -4,28 +4,35 @@
 <html>
 <head>
 <link rel="icon" href="logo.jpg" type="image/icon type">
-<title>Test Data Convertor</title>
+<title style="color:#003d99">Test Data Generator</title>
+
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
 &ensp; <input type="button" value="Home"
 				onClick="location.href='index.jsp'">
-<body>
+			
+<body  >
 	<center>
+ 
+		<form method="post" style="color:#003d99" action="dbTofile">
 
-		<form method="post" action="dbTofile">
-
-			<label for="uname">Database Username:</label>
+			&ensp;<label for="uname"><b>Database Username:</b></label>
 			 <input type="text" id="uname" name="username"><br> <br> 
-			 <label for="pass">Database Password:</label> 
+			 <label for="pass"><b>Database Password:</b></label> 
 			 <input type="password" id="pass" name="password"><br> <br> 
-			 <label for="query">Database Query:</label> 
+			 &ensp;&ensp;&ensp;&ensp;<label for="query"><b>Database Query:</b></label> 
 			 <input type="text" id="query" name="query"><br> <br> 
-			 <label for="url">Database URL:</label> 
+			 &ensp;&ensp;&ensp;&ensp;&ensp;<label for="url"><b>Database URL:</b></label> 
 			 <input type="text" id="url" name="url"><br> <br>
-			 <label for="type">File Type:</label> 
-		     <input name="type" id="type" type="text" value="<%=request.getParameter("option")%>"/>				 
+			 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 			 
+		     <input name="type" id="type" type="text" value="<%=request.getParameter("option")%>"readonly/><br><br>
+		     &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="loc"><b>Save File To:</b></label> 
+			<input type="text" id="loc" name="loc" /> <br><br>	
+			&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="fileName"><b>Save File As:</b></label> 
+			<input type="text" id="fileName" name="fileName" /> <br><br>				 
 			<input type="submit" value="Generate Test-Data " size="20"
 				color="blue" />
+				
 		</form>
 	</center>
 	<footer>

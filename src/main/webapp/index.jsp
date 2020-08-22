@@ -1,6 +1,7 @@
 <html>
 <head>
 <link rel="icon" href="logo.jpg" type="image/icon type">
+<title style="color:#003d99">Test Data Generator</title>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
 <script>
 	function openPage() {
@@ -31,16 +32,18 @@
 		}
 	}
 </script>
+
 </head>
 <body>
 	<br>
 	<center>
 
 		<center>
-			<h1>Test Data generator Utility</h1>
+			<h1 style="color:#003d99">Test Data generator Utility</h1>
 		</center>
-		<form method="post" action="fileTofile" enctype="multipart/form-data">
-			<label for="fileTypes">Select the type of convertion:</label> <select
+		
+		<form method="post" style="color:#003d99"action="fileTofile" enctype="multipart/form-data">
+			<label for="fileTypes"><b>Select the type of convertion:</b></label> <select
 				name="files" id="files">
 				<option value="1">JSON to Excel</option>
 				<option value="2">Excel to JSON</option>

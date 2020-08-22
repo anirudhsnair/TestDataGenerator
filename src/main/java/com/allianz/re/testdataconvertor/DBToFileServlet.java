@@ -41,17 +41,25 @@ public class DBToFileServlet extends HttpServlet {
         String query = request.getParameter("query");
         String dbURL = request.getParameter("url");
         String type = request.getParameter("type");
+        String loc = request.getParameter("loc");
+        String fileName = request.getParameter("fileName");
+        String ext = null;
         String outputPath = null;
         if (type.equals("DB to CSV")) {
             type = "csv";
+            ext = ".csv";
         } else if (type.equals("DB to JSON")) {
             type = "json";
+            ext = ".json";
+
         } else if (type.equals("DB to Excel")) {
             type = "excel";
+            ext = ".xlsx";
         }
+
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
-            outputPath = DBConversion(query, type, dbURL, username, password);
+            outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -62,7 +70,14 @@ public class DBToFileServlet extends HttpServlet {
         htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
         htmlResponse += "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
         htmlResponse += "<center>";
-        htmlResponse += "<h2>Hurray! Your test-data is ready @: " + outputPath + "<colur=blue>" + "<br/>";
+        if (fileName.isEmpty()) {
+
+            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
+        } else {
+            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + ext + "] is ready @: "
+                    + outputPath + "<br/>";
+        }
+
         htmlResponse += "</center>";
         htmlResponse += "<footer>\r\n" + "<img src=\"gtf.PNG\" style=\"float: right;\"width=\"95\" height=\"22\" />\r\n"
                 + "</footer>";
@@ -73,13 +88,13 @@ public class DBToFileServlet extends HttpServlet {
     }
 
     public static void main(String[] args) throws SQLException, IOException {
-        String outputPath = DBConversion("SELECT * FROM SII_TABLES", "json",
-                "jdbc:oracle:thin:@sla06184.srv.allianz:1521/REGRIPT", "PRISMRI_D", "solv_core");
-        System.out.print(outputPath);
+        // String outputPath = DBConversion("SELECT * FROM SII_TABLES", "json",
+        // "jdbc:oracle:thin:@sla06184.srv.allianz:1521/REGRIPT", "PRISMRI_D", "solv_core");
+        // System.out.print(outputPath);
     }
 
     public static String DBConversion(String query, String outputformat, String jdbcUrl, String username,
-            String password) throws SQLException, IOException {
+            String password, String loc, String fileName) throws SQLException, IOException {
         try {
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             statement = connection.createStatement();
@@ -87,16 +102,21 @@ public class DBToFileServlet extends HttpServlet {
 
             e.printStackTrace();
         }
-        String filepath = System.getProperty("java.io.tmpdir");
+        String filepath = null;
+        if (loc.isEmpty()) {
+            filepath = System.getProperty("java.io.tmpdir");
+        } else {
+            filepath = loc;
+        }
         switch (outputformat) {
             case "csv":
-                exportToCSV(query, filepath);
+                exportToCSV(query, filepath, fileName);
                 break;
             case "json":
-                exportToJson(query, filepath);
+                exportToJson(query, filepath, fileName);
                 break;
             case "excel":
-                exportToExcel(query, filepath);
+                exportToExcel(query, filepath, fileName);
                 break;
         }
         return filepath;
@@ -109,8 +129,10 @@ public class DBToFileServlet extends HttpServlet {
         return baseName.concat(String.format("_%s", dateTimeInfo));
     }
 
-    public static void exportToExcel(String query, String filepath) {
-        String filename = getFileName("ExcelExport");
+    public static void exportToExcel(String query, String filepath, String filename) {
+        if (filename.isEmpty()) {
+            filename = getFileName("ExcelExport");
+        }
         try {
             String sql = query;
             ResultSet result = statement.executeQuery(sql);
@@ -195,9 +217,11 @@ public class DBToFileServlet extends HttpServlet {
     }
 
     // =====================================================csv===========================================
-    public static void exportToCSV(String query, String filepath) throws SQLException {
+    public static void exportToCSV(String query, String filepath, String filename) throws SQLException {
         try {
-            String filename = getFileName("CSVExport");
+            if (filename.isEmpty()) {
+                filename = getFileName("CSVExport");
+            }
             FileWriter fw = new FileWriter(filepath + filename + ".csv");
             if (connection.isClosed())
                 statement = connection.createStatement();
@@ -232,9 +256,11 @@ public class DBToFileServlet extends HttpServlet {
 
     // ====================================================db to
     // json==========================================================
-    public static void exportToJson(String query, String filepath) throws SQLException, IOException {
+    public static void exportToJson(String query, String filepath, String filename) throws SQLException, IOException {
+        if (filename.isEmpty()) {
 
-        String filename = getFileName("JsonExport");
+            filename = getFileName("JsonExport");
+        }
         ResultSet rs = statement.executeQuery(query);
 
         JSONArray jsonArray = new JSONArray();
