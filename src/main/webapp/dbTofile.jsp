@@ -5,7 +5,47 @@
 <head>
 <link rel="icon" href="logo.jpg" type="image/icon type">
 <title style="color:#003d99">Test Data Generator</title>
+		<script type="text/javascript">
+				function dbTofileformValidation()
+				{
+						var uname = document.getElementById("uname");	
+           				var pwd = document.getElementById("pass");						
+           				var query = document.getElementById("query");
+           				var url = document.getElementById("url");		
+           				var loc = document.getElementById("loc");	
+           				var fileName = document.getElementById("fileName");						
+           									
+				
+											
+				
+        if(uname.value=="") 
+        { 
+            alert("Please enter username:"); 
+        return false;
 
+        }  
+        else if(pwd.value=="") 
+        { 
+            alert("Please enter password:"); 
+        return false;
+
+        }
+        else if(query.value=="") 
+        { 
+            alert("Please enter the query:"); 
+        return false;
+
+        }
+        else if(url.value=="") 
+        { 
+            alert("Please enter the url:"); 
+        return false;
+
+        }
+        
+				return true;
+				}
+				</script>
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
 &ensp; <input type="button" value="Home"
@@ -14,7 +54,7 @@
 <body  >
 	<center>
  
-		<form method="post" style="color:#003d99" action="dbTofile">
+		<form method="post" style="color:#003d99" action="dbTofile" onsubmit="return dbTofileformValidation()">
 
 			&ensp;<label for="uname"><b>Database Username:</b></label>
 			 <input type="text" id="uname" name="username"><br> <br> 

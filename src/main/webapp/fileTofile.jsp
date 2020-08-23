@@ -7,16 +7,32 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="icon" href="logo.jpg" type="image/icon type">
 <title style="color:#003d99">Test Data Generator</title>
+
+								<script type="text/javascript">
+				function fileTofileformValidation()
+				{
+						var file = document.getElementById("file");						
+				
+        if(file.value=="") 
+        { 
+            alert("Please select a file:"); 
+        return false;
+
+        }  
+        
+				return true;
+				}
+				</script>
+
+</head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
 &ensp; <input type="button" value="Home"
 				onClick="location.href='index.jsp'">
-</head>
-<body >
-
+<body > 
 	<center>
       <br>
        
-		<form method="post" style="color:#003d99" action="uploadFile" enctype="multipart/form-data">
+		<form method="post" name="fileTofileForm" style="color:#003d99" action="uploadFile" onsubmit="return fileTofileformValidation()" enctype="multipart/form-data">
             &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="file"><b>Select File:</b></label> 
 			<input type="file" id="file" name="uploadFile" /> <br><br>
 			<label for="loc"><b>Save File To:</b></label> 
