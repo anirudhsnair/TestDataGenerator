@@ -42,6 +42,18 @@
         return false;
 
         }
+        else if(loc.value=="") 
+        {
+        alert("Please input the location to be saved");
+        return false;
+
+        }
+        else if(fileName.value=="") 
+        { 
+            alert("Please input the name of the file");
+        return false;
+
+        }
         
 				return true;
 				}

@@ -39,6 +39,7 @@ public class DBToFileServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String query = request.getParameter("query");
+        String qry[] = query.split(";");
         String dbURL = request.getParameter("url");
         String type = request.getParameter("type");
         String loc = request.getParameter("loc");
@@ -56,13 +57,6 @@ public class DBToFileServlet extends HttpServlet {
             type = "excel";
             ext = ".xlsx";
         }
-
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName);
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         PrintWriter writer = response.getWriter();
         // build HTML code
         String htmlResponse = "<html>";
@@ -70,14 +64,41 @@ public class DBToFileServlet extends HttpServlet {
         htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
         htmlResponse += "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
         htmlResponse += "<center>";
-        if (fileName.isEmpty()) {
 
-            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
+        if (qry.length > 1) {
+            for (int i = 0; i < qry.length; i++) {
+                try {
+                    Class.forName("oracle.jdbc.driver.OracleDriver");
+                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName);
+                } catch (SQLException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if (fileName.isEmpty()) {
+
+                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
+                            + "<br/>";
+                } else {
+                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + i + ext
+                            + "] is ready @: " + outputPath + "<br/>";
+                }
+            }
         } else {
-            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + ext + "] is ready @: "
-                    + outputPath + "<br/>";
-        }
+            try {
+                Class.forName("oracle.jdbc.driver.OracleDriver");
+                outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName);
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            if (fileName.isEmpty()) {
 
+                htmlResponse +=
+                             "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
+            } else {
+                htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + ext
+                        + "] is ready @: " + outputPath + "<br/>";
+            }
+
+        }
         htmlResponse += "</center>";
         htmlResponse += "<footer>\r\n" + "<img src=\"gtf.PNG\" style=\"float: right;\"width=\"95\" height=\"22\" />\r\n"
                 + "</footer>";

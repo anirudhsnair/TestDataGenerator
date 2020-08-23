@@ -11,7 +11,10 @@
 								<script type="text/javascript">
 				function fileTofileformValidation()
 				{
-						var file = document.getElementById("file");						
+						var file = document.getElementById("file");	
+					    var loc = document.getElementById("loc");						
+			            var outputName = document.getElementById("outputfileName");						
+											
 				
         if(file.value=="") 
         { 
@@ -19,9 +22,20 @@
         return false;
 
         }  
+        else if(loc.value=="")
+        {
+        alert("Please input the location to be saved");
+        return false;
+        }
+        else if(outputName.value=="")
+        {
+        alert("Please input the name of the file");
+        return false;
+        }
         
 				return true;
 				}
+				
 				</script>
 
 </head>
@@ -33,8 +47,10 @@
       <br>
        
 		<form method="post" name="fileTofileForm" style="color:#003d99" action="uploadFile" onsubmit="return fileTofileformValidation()" enctype="multipart/form-data">
+		      
+
             &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="file"><b>Select File:</b></label> 
-			<input type="file" id="file" name="uploadFile" /> <br><br>
+			<input type="file" multiple id="file" name="uploadFile"  /> <br><br>
 			<label for="loc"><b>Save File To:</b></label> 
 			<input type="text" id="loc" name="loc" /> <br><br>
 			<label for="outputfileName"><b>Save File As:</b></label> 

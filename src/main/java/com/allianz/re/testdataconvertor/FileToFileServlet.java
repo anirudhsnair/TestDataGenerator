@@ -65,6 +65,20 @@ public class FileToFileServlet extends HttpServlet {
 
     private String filename;
 
+    private String outputPath;
+
+    private String ext;
+
+    static String outputFileName;
+
+    public String getOutputFileName() {
+        return outputFileName;
+    }
+
+    public static void setOutputFileName(String optFileName) {
+        outputFileName = optFileName;
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // checks if the request actually contains upload file
@@ -100,6 +114,13 @@ public class FileToFileServlet extends HttpServlet {
         if (!uploadDir.exists()) {
             uploadDir.mkdir();
         }
+        PrintWriter writer = response.getWriter();
+        // build HTML code
+        String htmlResponse = "<html>";
+        htmlResponse += "<link rel=\"icon\" href=\"logo.jpg\" type=\"image/icon type\">";
+        htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
+        htmlResponse += "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
+        htmlResponse += "<center>";
 
         try {
             // parses the request's content to extract file data
@@ -107,19 +128,9 @@ public class FileToFileServlet extends HttpServlet {
             List<FileItem> formItems = upload.parseRequest(request);
 
             if (formItems != null && formItems.size() > 0) {
-                // iterates over form's fields
                 for (FileItem item : formItems) {
-                    // processes only fields that are not form fields
-                    if (!item.isFormField()) {
 
-                        fileName = new File(item.getName()).getName();
-                        filePath = uploadPath + File.separator + fileName;
-                        File storeFile = new File(filePath);
-
-                        // saves the file on disk
-                        item.write(storeFile);
-                        request.setAttribute("message", "Upload has been done successfully!");
-                    } else {
+                    if (item.isFormField()) {
                         if (item.getFieldName().equals("loc")) {
                             loc = item.getString();
                         } else if (item.getFieldName().equals("type")) {
@@ -134,46 +145,54 @@ public class FileToFileServlet extends HttpServlet {
 
                     }
                 }
+                // iterates over form's fields
+                int i = 1;
+                for (FileItem item : formItems) {
+
+                    // processes only fields that are not form fields
+                    if (!item.isFormField()) {
+                        fileName = new File(item.getName()).getName();
+                        filePath = uploadPath + File.separator + fileName;
+                        File storeFile = new File(filePath);
+                        // saves the file on disk
+                        item.write(storeFile);
+                        request.setAttribute("message", "Upload has been done successfully!");
+                        if (formItems.get(1).getName() != null) {
+                            filename = filename + i;
+                        }
+                        // if (filename.isEmpty()) {
+                        // filename = filename.substring(0, filename.length() - 1);
+                        // }
+                        if (type.equals("JSON to Excel")) {
+                            outputPath = jsonToExcel(filePath, loc, filename);
+                            ext = ".xlsx";
+                        } else if (type.equals("Excel to JSON")) {
+                            outputPath = excelToJson(filePath, loc, filename);
+                            ext = ".json";
+
+                        } else if (type.equals("XML to JSON")) {
+                            outputPath = xmlToJson(filePath, loc, filename);
+                            ext = ".json";
+
+                        } else if (type.equals("JSON to XML")) {
+                            outputPath = jsonToXml(filePath, loc, filename);
+                            ext = ".xml";
+
+                        }
+
+                        if (filename.isEmpty()) {
+                            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data ["
+                                    + getOutputFileName() + "] is ready @: " + outputPath + "<br/>";
+                        } else {
+                            htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + filename + ext
+                                    + "] is ready @: " + outputPath + "<br/>";
+                        }
+                        filename = filename.substring(0, filename.length() - 1);
+                        i++;
+                    }
+                }
             }
-            // String name = item.getFieldName();
-            System.out.println("outputfileName=" + filename);
-            System.out.println("type=" + type);
 
-            String outputPath = null;
-            String ext = null;
-            if (type.equals("JSON to Excel")) {
-                outputPath = jsonToExcel(filePath, loc, filename);
-                ext = ".xlsx";
-            } else if (type.equals("Excel to JSON")) {
-                outputPath = excelToJson(filePath, loc, filename);
-                ext = ".json";
-
-            } else if (type.equals("XML to JSON")) {
-                outputPath = xmlToJson(filePath, loc, filename);
-                ext = ".json";
-
-            } else if (type.equals("JSON to XML")) {
-                outputPath = jsonToXml(filePath, loc, filename);
-                ext = ".xml";
-
-            }
-
-            PrintWriter writer = response.getWriter();
-            // build HTML code
-            String htmlResponse = "<html>";
-            htmlResponse += "<link rel=\"icon\" href=\"logo.jpg\" type=\"image/icon type\">";
-            htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
-            htmlResponse +=
-                         "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
-            htmlResponse += "<center>";
-            if (filename.isEmpty()) {
-
-                htmlResponse +=
-                             "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
-            } else {
-                htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + filename + ext
-                        + "] is ready @: " + outputPath + "<br/>";
-            }
             htmlResponse += "</center>";
             htmlResponse += "<footer>\r\n"
                     + "<img src=\"gtf.PNG\" style=\"float: right;\"width=\"95\" height=\"22\" />\r\n" + "</footer>";
@@ -196,7 +215,7 @@ public class FileToFileServlet extends HttpServlet {
         } else {
             filepath = loc;
         }
-        if (filename.isEmpty()) {
+        if (filename.isEmpty() || filename.equals("1") || filename.equals("2") || filename.equals("3")) {
             filename = filepath + name + ".xml";
         } else {
             filename = filepath + filename + ".xml";
@@ -227,6 +246,7 @@ public class FileToFileServlet extends HttpServlet {
         IOException e) {
             e.printStackTrace();
         }
+        setOutputFileName(filename);
 
         return filepath;
 
@@ -389,6 +409,8 @@ public class FileToFileServlet extends HttpServlet {
 
         }
         // Writing excel headers
+        setOutputFileName(filename);
+
         return filepath;
     }
 
@@ -400,7 +422,7 @@ public class FileToFileServlet extends HttpServlet {
 
     public static String excelToJson(String input, String loc, String filename)
             throws EncryptedDocumentException, InvalidFormatException, IOException {
-        if (filename.isEmpty()) {
+        if (filename.isEmpty() || filename.equals("1") || filename.equals("2") || filename.equals("3")) {
             filename = getFileName("jsonExport");
         }
 
@@ -455,12 +477,13 @@ public class FileToFileServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
+        setOutputFileName(filename);
         return filepath;
     }
 
     public static String xmlToJson(String input, String loc, String filename) {
         String filepath = null;
-        if (filename.isEmpty()) {
+        if (filename.isEmpty() || filename.equals("1") || filename.equals("2") || filename.equals("3")) {
             filename = getFileName("jsonExport");
         }
 
@@ -492,10 +515,11 @@ public class FileToFileServlet extends HttpServlet {
             }
             bufferedWriter.close();
         } catch (IOException ex) {
-            System.out.println("Error writing to file '" + filename + "'");
+            ex.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        setOutputFileName(filename);
         return filepath;
     }
 }
