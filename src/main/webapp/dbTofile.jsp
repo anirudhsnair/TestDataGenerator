@@ -60,15 +60,16 @@
 				</script>
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
-&ensp; <input type="button" value="Home"
-				onClick="location.href='index.jsp'">
+
 			
 <body  >
+<center>
+			<h1 style="color:#003d99">Test Data generator Utility </h1>
+		</center>
 	<center>
  
 		<form method="post" style="color:#003d99" action="dbTofile" onsubmit="return dbTofileformValidation()">
-
-			&ensp;<label for="uname"><b>Database Username:</b></label>
+		     <label for="uname"><b>Database Username:</b></label>
 			 <input type="text" id="uname" name="username"><br> <br> 
 			 <label for="pass"><b>Database Password:</b></label> 
 			 <input type="password" id="pass" name="password"><br> <br> 

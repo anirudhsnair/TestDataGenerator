@@ -40,15 +40,15 @@
 
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
-&ensp; <input type="button" value="Home"
-				onClick="location.href='index.jsp'">
 <body > 
+<center>
+			<h1 style="color:#003d99">Test Data generator Utility </h1>
+		</center>
 	<center>
       <br>
        
 		<form method="post" name="fileTofileForm" style="color:#003d99" action="uploadFile" onsubmit="return fileTofileformValidation()" enctype="multipart/form-data">
 		      
-
             &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="file"><b>Select File:</b></label> 
 			<input type="file" multiple id="file" name="uploadFile"  /> <br><br>
 			<label for="loc"><b>Save File To:</b></label> 

@@ -60,16 +60,22 @@ public class DBToFileServlet extends HttpServlet {
         PrintWriter writer = response.getWriter();
         // build HTML code
         String htmlResponse = "<html>";
+        htmlResponse += "<script>function GoBackWithRefresh(event) {\r\n" + "    if ('referrer' in document) {\r\n"
+                + "        window.location = document.referrer;\r\n" + "        /* OR */\r\n"
+                + "        //location.replace(document.referrer);\r\n" + "    } else {\r\n"
+                + "        window.history.back();\r\n" + "    }\r\n" + "}</script>";
         htmlResponse += "<link rel=\"icon\" href=\"logo.jpg\" type=\"image/icon type\">";
         htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
-        htmlResponse += "&ensp; <input type=\"button\" value=\"Home\"\r\n" + "onClick=\"location.href='index.jsp'\">";
+        htmlResponse += "&ensp; <input type=\"button\" value=\"Go Back\"\r\n"
+                + "onClick=\"GoBackWithRefresh();return false;\">";
         htmlResponse += "<center>";
 
         if (qry.length > 1) {
             for (int i = 0; i < qry.length; i++) {
                 try {
                     Class.forName("oracle.jdbc.driver.OracleDriver");
-                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName);
+                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName + i);
+                    System.out.println("converted File");
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
