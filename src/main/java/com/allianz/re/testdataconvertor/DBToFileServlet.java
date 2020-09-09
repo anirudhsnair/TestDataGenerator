@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -36,6 +37,8 @@ public class DBToFileServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(true);
+        response.setContentType("text/html");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String query = request.getParameter("query");
@@ -46,6 +49,7 @@ public class DBToFileServlet extends HttpServlet {
         String fileName = request.getParameter("fileName");
         String ext = null;
         String outputPath = null;
+        session.setAttribute("Query", query);
         if (type.equals("DB to CSV")) {
             type = "csv";
             ext = ".csv";
@@ -58,29 +62,32 @@ public class DBToFileServlet extends HttpServlet {
             ext = ".xlsx";
         }
         PrintWriter writer = response.getWriter();
+        // System.out.println("Stored in session" + session.getAttribute("Query"));
         // build HTML code
         String htmlResponse = "<html>";
         htmlResponse += "<script>function GoBackWithRefresh(event) {\r\n" + "    if ('referrer' in document) {\r\n"
                 + "        window.location = document.referrer;\r\n" + "        /* OR */\r\n"
                 + "        //location.replace(document.referrer);\r\n" + "    } else {\r\n"
-                + "        window.history.back();\r\n" + "    }\r\n" + "}</script>";
+                + "        window.history.back();\r\n" + "    }\r\n" + "} function logOut()\r\n"
+                + "                {window.location.replace(\"index.jsp\");}</script>";
         htmlResponse += "<link rel=\"icon\" href=\"logo.jpg\" type=\"image/icon type\">";
         htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
+        htmlResponse +=
+                     "<img src=\"logOut.png\" width=\"80\" height=\"20\" style=\"float: right; \" onClick=\"logOut()\" />\r\n"
+                             + "";
         htmlResponse += "&ensp; <input type=\"button\" value=\"Go Back\"\r\n"
                 + "onClick=\"GoBackWithRefresh();return false;\">";
         htmlResponse += "<center>";
-
+        htmlResponse += "<br/>";
         if (qry.length > 1) {
             for (int i = 0; i < qry.length; i++) {
                 try {
                     Class.forName("oracle.jdbc.driver.OracleDriver");
                     outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName + i);
-                    System.out.println("converted File");
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 if (fileName.isEmpty()) {
-
                     htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
                             + "<br/>";
                 } else {

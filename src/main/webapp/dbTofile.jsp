@@ -57,10 +57,16 @@
         
 				return true;
 				}
+				
+				function logOut()
+				{
+				            window.location.replace("index.jsp");
+				
+				}
 				</script>
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
-
+<img src="logOut.png" width="80" height="20" style="float: right; " onClick="logOut()" />
 			
 <body  >
 <center>
@@ -74,7 +80,7 @@
 			 <label for="pass"><b>Database Password:</b></label> 
 			 <input type="password" id="pass" name="password"><br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;<label for="query"><b>Database Query:</b></label> 
-			 <input type="text" id="query" name="query"><br> <br> 
+			 <input type="text" id="query" name="query" value="<%= request.getSession().getAttribute("Query")%>"/><br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;&ensp;<label for="url"><b>Database URL:</b></label> 
 			 <input type="text" id="url" name="url"><br> <br>
 			 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 			 

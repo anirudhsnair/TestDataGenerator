@@ -81,6 +81,7 @@ public class FileToFileServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         // checks if the request actually contains upload file
         if (!ServletFileUpload.isMultipartContent(request)) {
             // if not, we stop here
@@ -120,12 +121,17 @@ public class FileToFileServlet extends HttpServlet {
         htmlResponse += "<script>function GoBackWithRefresh(event) {\r\n" + "    if ('referrer' in document) {\r\n"
                 + "        window.location = document.referrer;\r\n" + "        /* OR */\r\n"
                 + "        //location.replace(document.referrer);\r\n" + "    } else {\r\n"
-                + "        window.history.back();\r\n" + "    }\r\n" + "}</script>";
+                + "        window.history.back();\r\n" + "    }\r\n" + "} function logOut()\r\n"
+                + "                {window.location.replace(\"index.jsp\");}</script>";
         htmlResponse += "<link rel=\"icon\" href=\"logo.jpg\" type=\"image/icon type\">";
         htmlResponse += "<img src=\"allianz_logo.png\" width=\"80\" height=\"20\" style=\"float: left;\" />";
+        htmlResponse +=
+                     "<img src=\"logOut.png\" width=\"80\" height=\"20\" style=\"float: right; \" onClick=\"logOut()\" />\r\n"
+                             + "";
         htmlResponse += "&ensp; <input type=\"button\" value=\"Go Back\"\r\n"
                 + "onclick=\"GoBackWithRefresh();return false;\">";
         htmlResponse += "<center>";
+        htmlResponse += "<br/>";
         try {
             // parses the request's content to extract file data
             @SuppressWarnings("unchecked")

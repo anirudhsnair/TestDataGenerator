@@ -35,11 +35,18 @@
         
 				return true;
 				}
+				function logOut()
+				{
+				            window.location.replace("index.jsp");
+				
+				}
 				
 				</script>
 
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
+<img src="logOut.png" width="80" height="20" style="float: right; " onClick="logOut()" />
+
 <body > 
 <center>
 			<h1 style="color:#003d99">Test Data generator Utility </h1>
