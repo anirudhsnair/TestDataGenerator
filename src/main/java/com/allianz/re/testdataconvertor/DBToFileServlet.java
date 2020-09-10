@@ -49,7 +49,9 @@ public class DBToFileServlet extends HttpServlet {
         String fileName = request.getParameter("fileName");
         String ext = null;
         String outputPath = null;
-        session.setAttribute("Query", query);
+        if (!session.equals(null)) {
+            session.setAttribute("Query", query);
+        }
         if (type.equals("DB to CSV")) {
             type = "csv";
             ext = ".csv";
