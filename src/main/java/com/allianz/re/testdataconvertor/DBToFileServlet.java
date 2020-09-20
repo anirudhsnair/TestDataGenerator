@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -46,7 +47,11 @@ public class DBToFileServlet extends HttpServlet {
         String dbURL = request.getParameter("url");
         String type = request.getParameter("type");
         String loc = request.getParameter("loc");
-        String fileName = request.getParameter("fileName");
+        ArrayList<String> fileName = new ArrayList<String>();
+        for (int i = 0; i < qry.length; i++) {
+            fileName.add(request.getParameter("fileName" + i));
+        }
+        System.out.println(fileName.toString());
         String ext = null;
         String outputPath = null;
         if (!session.equals(null)) {
@@ -85,22 +90,22 @@ public class DBToFileServlet extends HttpServlet {
             for (int i = 0; i < qry.length; i++) {
                 try {
                     Class.forName("oracle.jdbc.driver.OracleDriver");
-                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName + i);
+                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName.get(i));
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                if (fileName.isEmpty()) {
+                if (fileName.get(i).isEmpty()) {
                     htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
                             + "<br/>";
                 } else {
-                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + i + ext
+                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(i) + ext
                             + "] is ready @: " + outputPath + "<br/>";
                 }
             }
         } else {
             try {
                 Class.forName("oracle.jdbc.driver.OracleDriver");
-                outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName);
+                outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName.get(0));
             } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -109,7 +114,7 @@ public class DBToFileServlet extends HttpServlet {
                 htmlResponse +=
                              "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
             } else {
-                htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName + ext
+                htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(0) + ext
                         + "] is ready @: " + outputPath + "<br/>";
             }
 

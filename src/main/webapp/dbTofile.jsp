@@ -36,6 +36,7 @@
         return false;
 
         }
+       
         else if(url.value=="") 
         { 
             alert("Please enter the url:"); 
@@ -64,9 +65,29 @@ window.location.replace("index.jsp");
 session.invalidate();
 				            
 				}
-//				function ClearFields() {
-//     document.getElementById("query").value = "";
-//}
+				function queryValidation(obj)
+				{
+					var input;
+					var  brk=document.createElement('br');;
+					var fileNames = document.getElementById("fileName");
+       				var query = obj.value;
+			        var qry = query.split(";");
+		            var i;
+						for (i=1; i < qry.length ;i++)
+							
+						{	
+							alert(query);
+						    input = document.createElement('input');
+						    input.id="fileName"+i;
+						    input.name="fileName"+i;
+						    input.setAttribute('type', 'text');
+                            input.appendChild(brk);
+						    fileNames.appendChild(input);
+
+
+						}
+
+				}
 				</script>
 </head>
 <img src="allianz_logo.png" width="80" height="20" style="float: left;" />
@@ -84,15 +105,19 @@ session.invalidate();
 			 <label for="pass"><b>Database Password:</b></label> 
 			 <input type="password" id="pass" name="password"><br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;<label for="query"><b>Database Query:</b></label> 
-			 <input type="text" id="query" name="query" value="<%=request.getSession().getAttribute("Query") %>"/> <br> <br> 
+			 <input type="text" id="query" name="query" value="<%=request.getSession().getAttribute("Query")%>" onchange="queryValidation(this)"/> <br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;<label for="url"><b>Database URL:</b></label> 
 			 <input type="text" id="url" name="url"><br> <br>
 			 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 			 
 		     <input name="type" id="type" type="text" value="<%=request.getParameter("option")%>"readonly/><br><br>
 		     &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="loc"><b>Save File To:</b></label> 
 			<input type="text" id="loc" name="loc" /> <br><br>	
-			&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="fileName"><b>Save File As:</b></label> 
-			<input type="text" id="fileName" name="fileName" /> <br><br>				 
+			 <div  id="fileName" name="fileName">
+             &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="fileName"><b>Save File As:</b></label> 
+             <input type="text" id="fileName0" name="fileName0" /> <br><br>	
+             &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;	
+             </div>
+             <br>
 			<input type="submit" value="Generate Test-Data " size="20"
 				color="blue" />
 				
