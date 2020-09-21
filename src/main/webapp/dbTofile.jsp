@@ -5,7 +5,13 @@
 <head>
 <link rel="icon" href="logo.jpg" type="image/icon type">
 <title style="color:#003d99">Test Data Generator</title>
+</head>
+<img src="allianz_logo.png" width="80" height="20" style="float: left;" />
+<img src="logOut.png" width="80" height="20" style="float: right; " onClick="logOut()" />
+			
+<body  >
 		<script type="text/javascript">
+			
 				function dbTofileformValidation()
 				{
 						var uname = document.getElementById("uname");	
@@ -15,9 +21,6 @@
            				var loc = document.getElementById("loc");	
            				var fileName = document.getElementById("fileName");						
            									
-				
-											
-				
         if(uname.value=="") 
         { 
             alert("Please enter username:"); 
@@ -65,35 +68,40 @@ window.location.replace("index.jsp");
 session.invalidate();
 				            
 				}
-				function queryValidation(obj)
+				
+				function queryValidation()
 				{
 					var input;
-					var  brk=document.createElement('br');;
 					var fileNames = document.getElementById("fileName");
-       				var query = obj.value;
+       				var query = document.getElementById("query").value;
 			        var qry = query.split(";");
-		            var i;
+		            var i;	
+		            var chk=document.getElementById("check").disabled;
+		            if(chk==false)
+		            	{
 						for (i=1; i < qry.length ;i++)
 							
 						{	
-							alert(query);
 						    input = document.createElement('input');
 						    input.id="fileName"+i;
 						    input.name="fileName"+i;
 						    input.setAttribute('type', 'text');
-                            input.appendChild(brk);
 						    fileNames.appendChild(input);
-
-
 						}
-
+				}
+	    	
+				}
+				
+				function checkBoxValidation(obj)
+				{
+					var query = obj.value;
+		            var qry = query.split(";");
+		            if(qry.length>1)
+                       {
+		            	document.getElementById("check").disabled = false;
+		            	}
 				}
 				</script>
-</head>
-<img src="allianz_logo.png" width="80" height="20" style="float: left;" />
-<img src="logOut.png" width="80" height="20" style="float: right; " onClick="logOut()" />
-			
-<body  >
 <center>
 			<h1 style="color:#003d99">Test Data generator Utility </h1>
 		</center>
@@ -105,13 +113,15 @@ session.invalidate();
 			 <label for="pass"><b>Database Password:</b></label> 
 			 <input type="password" id="pass" name="password"><br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;<label for="query"><b>Database Query:</b></label> 
-			 <input type="text" id="query" name="query" value="<%=request.getSession().getAttribute("Query")%>" onchange="queryValidation(this)"/> <br> <br> 
+			 <input type="text" id="query" name="query" value="<%=request.getSession().getAttribute("Query")%>" onchange="checkBoxValidation(this)"/> <br> <br> 
 			 &ensp;&ensp;&ensp;&ensp;<label for="url"><b>Database URL:</b></label> 
 			 <input type="text" id="url" name="url"><br> <br>
 			 &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 			 
 		     <input name="type" id="type" type="text" value="<%=request.getParameter("option")%>"readonly/><br><br>
 		     &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="loc"><b>Save File To:</b></label> 
 			<input type="text" id="loc" name="loc" /> <br><br>	
+			 <label for="check"><b>Multiple Workbooks:</b></label>
+			 <input type="checkbox" id="check" name="check"  onchange="queryValidation()" disabled/>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<br> <br> 
 			 <div  id="fileName" name="fileName">
              &ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="fileName"><b>Save File As:</b></label> 
              <input type="text" id="fileName0" name="fileName0" /> <br><br>	

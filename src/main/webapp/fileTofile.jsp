@@ -62,8 +62,9 @@
 			<input type="text" id="loc" name="loc" /> <br><br>
 			<label for="outputfileName"><b>Save File As:</b></label> 
 			<input type="text" id="outputfileName" name="outputfileName" /> <br><br>
-			&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 
+			&ensp;&ensp;&ensp;<label for="type"><b>File Type:</b></label> 
 		     <input name="type" id="type" type="text" value="<%=request.getParameter("option")%>"readonly/>	
+		     <br><br>
 			<input type="submit" value="Generate Test-Data" />
 		</form>
 		

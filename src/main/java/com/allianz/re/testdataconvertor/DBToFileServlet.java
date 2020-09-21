@@ -47,11 +47,14 @@ public class DBToFileServlet extends HttpServlet {
         String dbURL = request.getParameter("url");
         String type = request.getParameter("type");
         String loc = request.getParameter("loc");
+        String multiplefiles = request.getParameter("check");
+        if (multiplefiles == null) {
+            multiplefiles = "off";
+        }
         ArrayList<String> fileName = new ArrayList<String>();
         for (int i = 0; i < qry.length; i++) {
             fileName.add(request.getParameter("fileName" + i));
         }
-        System.out.println(fileName.toString());
         String ext = null;
         String outputPath = null;
         if (!session.equals(null)) {
@@ -69,7 +72,6 @@ public class DBToFileServlet extends HttpServlet {
             ext = ".xlsx";
         }
         PrintWriter writer = response.getWriter();
-        // System.out.println("Stored in session" + session.getAttribute("Query"));
         // build HTML code
         String htmlResponse = "<html>";
         htmlResponse += "<script>function GoBackWithRefresh(event) {\r\n" + "    if ('referrer' in document) {\r\n"
@@ -86,26 +88,48 @@ public class DBToFileServlet extends HttpServlet {
                 + "onClick=\"GoBackWithRefresh();return false;\">";
         htmlResponse += "<center>";
         htmlResponse += "<br/>";
+        int numberOFsheets = qry.length;
         if (qry.length > 1) {
-            for (int i = 0; i < qry.length; i++) {
+            if (multiplefiles.equals("on")) {
+                for (int i = 0; i < qry.length; i++) {
+                    try {
+                        Class.forName("oracle.jdbc.driver.OracleDriver");
+                        outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName.get(i),
+                                multiplefiles, numberOFsheets);
+                    } catch (SQLException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    if (fileName.get(i).isEmpty()) {
+                        htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
+                                + "<br/>";
+                    } else {
+                        htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(i) + ext
+                                + "] is ready @: " + outputPath + "<br/>";
+                    }
+                }
+            } else {
                 try {
                     Class.forName("oracle.jdbc.driver.OracleDriver");
-                    outputPath = DBConversion(qry[i], type, dbURL, username, password, loc, fileName.get(i));
+                    outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName.get(0),
+                            multiplefiles, numberOFsheets);
+                    if (fileName.get(0).isEmpty()) {
+                        htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
+                                + "<br/>";
+                    } else {
+                        htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(0) + ext
+                                + "] is ready @: " + outputPath + "<br/>";
+                    }
+
                 } catch (SQLException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-                if (fileName.get(i).isEmpty()) {
-                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
-                            + "<br/>";
-                } else {
-                    htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(i) + ext
-                            + "] is ready @: " + outputPath + "<br/>";
-                }
+
             }
         } else {
             try {
                 Class.forName("oracle.jdbc.driver.OracleDriver");
-                outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName.get(0));
+                outputPath = DBConversion(query, type, dbURL, username, password, loc, fileName.get(0), multiplefiles,
+                        numberOFsheets);
             } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -131,11 +155,11 @@ public class DBToFileServlet extends HttpServlet {
     public static void main(String[] args) throws SQLException, IOException {
         // String outputPath = DBConversion("SELECT * FROM SII_TABLES", "json",
         // "jdbc:oracle:thin:@sla06184.srv.allianz:1521/REGRIPT", "PRISMRI_D", "solv_core");
-        // System.out.print(outputPath);
     }
 
     public static String DBConversion(String query, String outputformat, String jdbcUrl, String username,
-            String password, String loc, String fileName) throws SQLException, IOException {
+            String password, String loc, String fileName, String multiplefiles, int numberOfSheets)
+            throws SQLException, IOException {
         try {
             connection = DriverManager.getConnection(jdbcUrl, username, password);
             statement = connection.createStatement();
@@ -157,7 +181,7 @@ public class DBToFileServlet extends HttpServlet {
                 exportToJson(query, filepath, fileName);
                 break;
             case "excel":
-                exportToExcel(query, filepath, fileName);
+                exportToExcel(query, filepath, fileName, multiplefiles, numberOfSheets);
                 break;
         }
         return filepath;
@@ -170,20 +194,37 @@ public class DBToFileServlet extends HttpServlet {
         return baseName.concat(String.format("_%s", dateTimeInfo));
     }
 
-    public static void exportToExcel(String query, String filepath, String filename) {
+    public static void exportToExcel(String query, String filepath, String filename, String multiplefiles,
+            int numberOfSheets) {
         if (filename.isEmpty()) {
             filename = getFileName("ExcelExport");
         }
         try {
-            String sql = query;
-            ResultSet result = statement.executeQuery(sql);
 
             XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet sheet = workbook.createSheet("Testdata");
 
-            writeHeaderLine(result, sheet);
+            if (multiplefiles.equals("on")) {
+                String sql = query;
+                String[] st = sql.split("\\s+");
+                String sht = st[st.length - 1];
+                ResultSet result = statement.executeQuery(sql);
+                XSSFSheet sheet = workbook.createSheet(sht);
+                writeHeaderLine(result, sheet);
+                writeDataLines(result, workbook, sheet);
 
-            writeDataLines(result, workbook, sheet);
+            } else {
+
+                for (int i = 0; i < numberOfSheets; i++) {
+                    String qry[] = query.split(";");
+                    String sql = qry[i];
+                    String[] st = qry[i].split("\\s+");
+                    String sht = st[st.length - 1];
+                    ResultSet result = statement.executeQuery(sql);
+                    XSSFSheet sheet = workbook.createSheet(sht);
+                    writeHeaderLine(result, sheet);
+                    writeDataLines(result, workbook, sheet);
+                }
+            }
 
             FileOutputStream outputStream = new FileOutputStream(filepath + filename + ".xlsx");
             workbook.write(outputStream);
@@ -193,10 +234,8 @@ public class DBToFileServlet extends HttpServlet {
             connection.close();
 
         } catch (SQLException e) {
-            System.out.println("Datababse error:");
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("File IO error:");
             e.printStackTrace();
         }
     }
