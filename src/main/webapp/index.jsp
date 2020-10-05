@@ -29,7 +29,7 @@ function logOut()
 	<center>
 
 		<center>
-			<h1 style="color:#003d99">Test Data generator Utility Configuration</h1>
+			<h1 style="color:#003d99">Test Data Generator Utility Configuration</h1>
 		</center>
 		
 		<form method="post" style="color:#003d99"   action="login"  enctype="multipart/form-data">

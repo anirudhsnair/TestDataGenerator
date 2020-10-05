@@ -1,5 +1,6 @@
 package com.allianz.re.testdataconvertor;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -116,8 +117,9 @@ public class DBToFileServlet extends HttpServlet {
                         htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath
                                 + "<br/>";
                     } else {
+                        File file = new File(outputPath);
                         htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(0) + ext
-                                + "] is ready @: " + outputPath + "<br/>";
+                                + "] is ready @: <a href=" + file.getCanonicalPath() + ">" + outputPath + "<br/>";
                     }
 
                 } catch (SQLException | ClassNotFoundException e) {
@@ -138,8 +140,9 @@ public class DBToFileServlet extends HttpServlet {
                 htmlResponse +=
                              "<h2 style=\"color:#003d99;\">Hurray! Your test-data is ready @: " + outputPath + "<br/>";
             } else {
+                File file = new File(outputPath);
                 htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + fileName.get(0) + ext
-                        + "] is ready @: " + outputPath + "<br/>";
+                        + "] is ready @: <a href=" + file.getCanonicalPath() + ">" + outputPath + "<br/>";
             }
 
         }

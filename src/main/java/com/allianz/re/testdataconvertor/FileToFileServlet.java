@@ -194,6 +194,7 @@ public class FileToFileServlet extends HttpServlet {
                             htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data ["
                                     + getOutputFileName() + "] is ready @: " + outputPath + "<br/>";
                         } else {
+                            File file = new File(outputPath);
                             htmlResponse += "<h2 style=\"color:#003d99;\">Hurray! Your test-data [" + filename + ext
                                     + "] is ready @: " + outputPath + "<br/>";
                         }

@@ -49,7 +49,7 @@
 
 <body > 
 <center>
-			<h1 style="color:#003d99">Test Data generator Utility </h1>
+			<h1 style="color:#003d99">Test Data Generator Utility </h1>
 		</center>
 	<center>
       <br>
