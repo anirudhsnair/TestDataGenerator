@@ -156,8 +156,7 @@ public class DBToFileServlet extends HttpServlet {
     }
 
     public static void main(String[] args) throws SQLException, IOException {
-        // String outputPath = DBConversion("SELECT * FROM SII_TABLES", "json",
-        // "jdbc:oracle:thin:@sla06184.srv.allianz:1521/REGRIPT", "PRISMRI_D", "solv_core");
+        
     }
 
     public static String DBConversion(String query, String outputformat, String jdbcUrl, String username,
